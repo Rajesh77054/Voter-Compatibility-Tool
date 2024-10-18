@@ -1,0 +1,215 @@
+<!-- /voter-candidate-tool/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voter-Candidate Compatibility Tool</title>
+    <style>
+        /* Styles remain the same */
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Voter-Candidate Compatibility Tool</h1>
+        <form id="voterForm">
+            <!-- Sliders for each issue -->
+            <div class="slider-container">
+                <div class="slider-label">
+                    <span>Taxation: Lower Taxes</span><span>Raise Taxes for Wealthy</span>
+                </div>
+                <input type="range" min="1" max="5" value="3" id="taxation">
+            </div>
+
+            <div class="slider-container">
+                <div class="slider-label">
+                    <span>Small Business Support: Free Market</span><span>Targeted Government Aid</span>
+                </div>
+                <input type="range" min="1" max="5" value="3" id="smallBusiness">
+            </div>
+
+            <div class="slider-container">
+                <div class="slider-label">
+                    <span>Energy Policy: Expand Oil/Gas</span><span>Prioritize Renewable Energy</span>
+                </div>
+                <input type="range" min="1" max="5" value="3" id="energyPolicy">
+            </div>
+
+            <!-- More sliders for other issues -->
+
+            <button type="button" onclick="submitForm()">Submit</button>
+        </form>
+
+        <div id="result" class="result"></div>
+    </div>
+
+    <script>
+        let candidatePositions = {};
+
+        // Fetch candidate positions from the backend
+        async function fetchCandidatePositions() {
+            try {
+                const response = await fetch('http://localhost:3000/candidate/123'); // Example candidate ID
+                const data = await response.json();
+                candidatePositions = data.positions;
+            } catch (error) {
+                console.error('Error fetching candidate positions:', error);
+            }
+        }
+
+        // Calculate and send the result after submission
+        async function submitForm() {
+            const voterPositions = {
+                taxation: document.getElementById("taxation").value,
+                smallBusiness: document.getElementById("smallBusiness").value,
+                energyPolicy: document.getElementById("energyPolicy").value,
+                // Add more voter inputs here
+            };
+
+            // Calculate compatibility score
+            let totalDifference = 0;
+            let maxDifference = 0;
+
+            for (let issue in voterPositions) {
+                const voterPosition = parseInt(voterPositions[issue]);
+                const candidatePosition = parseInt(candidatePositions[issue]);
+                const difference = Math.abs(voterPosition - candidatePosition);
+                totalDifference += difference;
+                maxDifference += 4; // Maximum difference for each issue
+            }
+
+            const compatibilityScore = ((maxDifference - totalDifference) / maxDifference) * 100;
+            document.getElementById("result").innerHTML = `You are ${Math.round(compatibilityScore)}% aligned with the candidate!`;
+
+            // Send user interaction data to backend
+            try {
+                await fetch('http://localhost:3000/user-interaction', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        candidateId: '123',  // Example candidate ID
+                        voterPositions,
+                    }),
+                });
+            } catch (error) {
+                console.error('Error submitting interaction dataI'll proceed with connecting the **frontend to the backend**, implementing **user engagement tracking**, and preparing for the **view counting** and **monetization system**. Here’s the detailed breakdown of the steps and actions I will take:
+
+---
+
+### 1. **Connect Frontend to Backend**
+The frontend will fetch candidate positions dynamically from the backend and submit user interaction data to the backend after the form is submitted.
+
+#### Updated Frontend Code:
+This code uses JavaScript's `fetch()` to request candidate positions from the backend and send the voter’s responses to the backend for storage.
+
+```html
+<!-- /voter-candidate-tool/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Voter-Candidate Compatibility Tool</title>
+    <style>
+        /* Styles remain the same */
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Voter-Candidate Compatibility Tool</h1>
+        <form id="voterForm">
+            <!-- Sliders for each issue -->
+            <div class="slider-container">
+                <div class="slider-label">
+                    <span>Taxation: Lower Taxes</span><span>Raise Taxes for Wealthy</span>
+                </div>
+                <input type="range" min="1" max="5" value="3" id="taxation">
+            </div>
+
+            <div class="slider-container">
+                <div class="slider-label">
+                    <span>Small Business Support: Free Market</span><span>Targeted Government Aid</span>
+                </div>
+                <input type="range" min="1" max="5" value="3" id="smallBusiness">
+            </div>
+
+            <div class="slider-container">
+                <div class="slider-label">
+                    <span>Energy Policy: Expand Oil/Gas</span><span>Prioritize Renewable Energy</span>
+                </div>
+                <input type="range" min="1" max="5" value="3" id="energyPolicy">
+            </div>
+
+            <!-- More sliders for other issues -->
+
+            <button type="button" onclick="submitForm()">Submit</button>
+        </form>
+
+        <div id="result" class="result"></div>
+    </div>
+
+    <script>
+        let candidatePositions = {};
+
+        // Fetch candidate positions from the backend
+        async function fetchCandidatePositions() {
+            try {
+                const response = await fetch('http://localhost:3000/candidate/123'); // Example candidate ID
+                const data = await response.json();
+                candidatePositions = data.positions;
+            } catch (error) {
+                console.error('Error fetching candidate positions:', error);
+            }
+        }
+
+        // Calculate and send the result after submission
+        async function submitForm() {
+            const voterPositions = {
+                taxation: document.getElementById("taxation").value,
+                smallBusiness: document.getElementById("smallBusiness").value,
+                energyPolicy: document.getElementById("energyPolicy").value,
+                // Add more voter inputs here
+            };
+
+            // Calculate compatibility score
+            let totalDifference = 0;
+            let maxDifference = 0;
+
+            for (let issue in voterPositions) {
+                const voterPosition = parseInt(voterPositions[issue]);
+                const candidatePosition = parseInt(candidatePositions[issue]);
+                const difference = Math.abs(voterPosition - candidatePosition);
+                totalDifference += difference;
+                maxDifference += 4; // Maximum difference for each issue
+            }
+
+            const compatibilityScore = ((maxDifference - totalDifference) / maxDifference) * 100;
+            document.getElementById("result").innerHTML = `You are ${Math.round(compatibilityScore)}% aligned with the candidate!`;
+
+            // Send user interaction data to backend
+            try {
+                await fetch('http://localhost:3000/user-interaction', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        candidateId: '123',  // Example candidate ID
+                        voterPositions,
+                    }),
+                });
+            } catch (error) {
+                console.error('Error submitting interaction ', error);
+            }
+        }
+
+        // Fetch candidate positions on page load
+        fetchCandidatePositions();
+    </script>
+
+</body>
+</html>
