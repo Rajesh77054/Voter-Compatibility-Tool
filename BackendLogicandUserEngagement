@@ -1,0 +1,67 @@
+// /voter-candidate-tool/backend/server.js
+const express = require('express');
+const mongoose = require('mongoose');
+const bodyParser = require('body-parser');
+
+const app = express();
+const port = process.env.PORT || 3000;
+
+app.use(bodyParser.json());
+
+// Connect to MongoDB
+mongoose.connect('mongodb://localhost:27017/voterCandidateTool', {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
+});
+
+// Define a schema for candidate positions
+const CandidateSchema = new mongoose.Schema({
+    name: String,
+    positions: {
+        taxation: Number,
+        smallBusiness: Number,
+        energyPolicy: Number,
+        // Add other issues as fields
+    }
+});
+
+const Candidate = mongoose.model('Candidate', CandidateSchema);
+
+// API route to get candidate positions
+app.get('/candidate/:id', async (req, res) => {
+    try {
+        const candidate = await Candidate.findById(req.params.id);
+        if (!candidate) return res.status(404).send('Candidate not found');
+        res.json(candidate);
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
+});
+
+// Store user interaction data
+const UserInteractionSchema = new mongoose.Schema({
+    candidateId: String,
+    voterPositions: {
+        taxation: Number,
+        smallBusiness: Number,
+        energyPolicy: Number,
+        // Add other issues as fields
+    },
+    timestamp: { type: Date, default: Date.now }
+});
+
+const UserInteraction = mongoose.model('UserInteraction', UserInteractionSchema);
+
+app.post('/user-interaction', async (req, res) => {
+    try {
+        const interaction = new UserInteraction(req.body);
+        await interaction.save();
+        res.status(201).send('Interaction saved');
+    } catch (error) {
+        res.status(500).send(error.message);
+    }
+});
+
+app.listen(port, () => {
+    console.log(`Server running on port ${port}`);
+});
