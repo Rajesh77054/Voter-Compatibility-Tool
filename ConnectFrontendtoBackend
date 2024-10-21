@@ -1,4 +1,3 @@
-<!-- /voter-candidate-tool/index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -36,8 +35,6 @@
                 <input type="range" min="1" max="5" value="3" id="energyPolicy">
             </div>
 
-            <!-- More sliders for other issues -->
-
             <button type="button" onclick="submitForm()">Submit</button>
         </form>
 
@@ -64,7 +61,6 @@
                 taxation: document.getElementById("taxation").value,
                 smallBusiness: document.getElementById("smallBusiness").value,
                 energyPolicy: document.getElementById("energyPolicy").value,
-                // Add more voter inputs here
             };
 
             // Calculate compatibility score
@@ -95,18 +91,28 @@
                     }),
                 });
             } catch (error) {
-                console.error('Error submitting interaction dataI'll proceed with connecting the **frontend to the backend**, implementing **user engagement tracking**, and preparing for the **view counting** and **monetization system**. Here’s the detailed breakdown of the steps and actions I will take:
+                console.error('Error submitting interaction data### Next Tasks:
+I will continue by implementing the following:
+
+1. **Frontend to Backend Connection**:
+   - Ensure the frontend tool fetches candidate positions from the backend and submits user interaction data.
+
+2. **View Counting System**:
+   - Complete the logic for counting views and notifying campaigns when they reach their view limit.
+
+3. **Monetization (Stripe Integration)**:
+   - Finalize payment processing for campaigns needing to upgrade their plans when the view limit is exceeded.
 
 ---
 
-### 1. **Connect Frontend to Backend**
-The frontend will fetch candidate positions dynamically from the backend and submit user interaction data to the backend after the form is submitted.
+### Starting with Step 1: Frontend and Backend Connection
 
-#### Updated Frontend Code:
-This code uses JavaScript's `fetch()` to request candidate positions from the backend and send the voter’s responses to the backend for storage.
+This will include the dynamic fetching of candidate data and submission of user interaction.
+
+### Updated `/voter-candidate-tool/index.html`
+Here’s the updated code to connect the frontend and backend.
 
 ```html
-<!-- /voter-candidate-tool/index.html -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -144,8 +150,6 @@ This code uses JavaScript's `fetch()` to request candidate positions from the ba
                 <input type="range" min="1" max="5" value="3" id="energyPolicy">
             </div>
 
-            <!-- More sliders for other issues -->
-
             <button type="button" onclick="submitForm()">Submit</button>
         </form>
 
@@ -172,7 +176,6 @@ This code uses JavaScript's `fetch()` to request candidate positions from the ba
                 taxation: document.getElementById("taxation").value,
                 smallBusiness: document.getElementById("smallBusiness").value,
                 energyPolicy: document.getElementById("energyPolicy").value,
-                // Add more voter inputs here
             };
 
             // Calculate compatibility score
