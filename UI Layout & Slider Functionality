@@ -122,7 +122,23 @@
             const compatibilityScore = ((maxDifference - totalDifference) / maxDifference) * 100;
             document.getElementById("result").innerHTML = `You are ${Math.round(compatibilityScore)}% aligned with the candidate!`;
         }
-    </script>
+
+    // Track a view for the campaign when the page loads
+    async function trackView() {
+        try {
+            const response = await fetch('http://localhost:3000/campaign/123/view', { // Example campaign ID
+                method: 'POST',
+            });
+            const data = await response.json();
+            console.log('View count updated:', data);
+        } catch (error) {
+            console.error('Error tracking view:', error);
+        }
+    }
+
+    // Call the function to track the view when the page loads
+    trackView();
+</script>
 
 </body>
 </html>
