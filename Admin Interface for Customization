@@ -1,0 +1,107 @@
+<!-- /voter-candidate-tool/admin.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Campaign Customization Admin</title>
+    <style>
+        /* Admin page styling */
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f0f0;
+        }
+        .container {
+            width: 80%;
+            margin: 20px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+        }
+        input, button {
+            width: 100%;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Customize Your Campaign Tool</h1>
+        <!-- Form to upload logo -->
+        <form id="customizationForm" enctype="multipart/form-data">
+            <label for="campaignName">Campaign Name</label>
+            <input type="text" id="campaignName" name="campaignName" placeholder="Campaign Name">
+
+            <label for="logo">Upload Logo</label>
+            <input type="file" id="logo" name="logo">
+
+            <label for="colorScheme">Color Scheme</label>
+            <input type="color" id="colorScheme" name="colorScheme" value="#000000">
+
+            <label for="font">Font</label>
+            <select id="font" name="font">
+                <option value="Arial">Arial</option>
+                <option value="Verdana">Verdana</option>
+                <option value="Helvetica">Helvetica</option>
+            </select>
+
+            <!-- Slider customization -->
+            <div id="sliderContainer">
+                <h3>Sliders</h3>
+                <div class="slider-config">
+                    <label for="sliderLabel">Slider Label</label>
+                    <input type="text" id="sliderLabel" name="sliderLabel" placeholder="Issue Label">
+                    <label for="minValue">Min Value</label>
+                    <input type="number" id="minValue" name="minValue" min="1" max="5" value="1">
+                    <label for="maxValue">Max Value</label>
+                    <input type="number" id="maxValue" name="maxValue" min="5" max="10" value="5">
+                </div>
+            </div>
+
+            <button type="button" onclick="addSlider()">Add Another Slider</button>
+
+            <label for="successMessage">Custom Success Message</label>
+            <textarea id="successMessage" name="successMessage" placeholder="Success message..."></textarea>
+
+            <label for="resultDescription">Result Description</label>
+            <textarea id="resultDescription" name="resultDescription" placeholder="Result description..."></textarea>
+
+            <button type="submit">Save Customization</button>
+        </form>
+    </div>
+
+    <script>
+        function addSlider() {
+            const container = document.getElementById("sliderContainer");
+            const newSlider = document.createElement("div");
+            newSlider.innerHTML = `
+                <div class="slider-config">
+                    <label for="sliderLabel">Slider Label</label>
+                    <input type="text" id="sliderLabel" name="sliderLabel" placeholder="Issue Label">
+                    <label for="minValue">Min Value</label>
+                    <input type="number" id="minValue" name="minValue" min="1" max="5" value="1">
+                    <label for="maxValue">Max Value</label>
+                    <input type="number" id="maxValue" name="maxValue" min="5" max="10" value="5">
+                </div>
+            `;
+            container.appendChild(newSlider);
+        }
+
+        // Handle form submission (admin updates customization)
+        document.getElementById("customizationForm").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            try {
+                const response = await fetch('/api/campaign/customize', {
+                    method: 'POST',
+                    body: formData
+                });
+                const data = await response.json();
+                alert("Customization saved successfully!");
+            } catch (error) {
+                console.error('Error saving customization:', error);
+            }
+        });
+    </script>
+</body>
+</html>
