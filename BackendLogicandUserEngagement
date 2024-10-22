@@ -21,11 +21,21 @@ mongoose.connect('mongodb://localhost:27017/voterCandidateTool', {
 });
 
 // Example: Schema validation
+// /voter-candidate-tool/backend/server.js
+
 const CampaignSchema = new mongoose.Schema({
     campaignName: { type: String, required: true },
     viewCount: { type: Number, default: 0 },
     plan: { type: String, default: 'freemium' },
-    viewLimit: { type: Number, default: 200 }
+    viewLimit: { type: Number, default: 200 },
+    customization: {
+        sliders: [{ label: String, min: Number, max: Number }],  // Array of custom sliders
+        colorScheme: { type: String, default: '#000000' },  // Hex code for color scheme
+        font: { type: String, default: 'Arial' },  // Font style
+        logoUrl: { type: String },  // Path to uploaded logo
+        successMessage: { type: String, default: 'Thank you for using our tool!' },  // Custom success message
+        resultDescription: { type: String, default: 'You are aligned with the candidate!' }  // Custom result description
+    }
 });
 
 const Campaign = mongoose.model('Campaign', CampaignSchema);
