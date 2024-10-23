@@ -1,0 +1,44 @@
+// frontend/src/index.js
+import React, { useState } from 'react';
+import ReactDOM from 'react-dom';
+import './styles.css';
+
+const App = () => {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  const handleLogin = async (e) => {
+    e.preventDefault();
+    const response = await fetch('/api/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password }),
+    });
+    if (response.ok) {
+      setIsLoggedIn(true);
+    } else {
+      alert('Login failed!');
+    }
+  };
+
+  return (
+    <div className="container">
+      <h1>Admin Panel</h1>
+      {!isLoggedIn ? (
+        <form onSubmit={handleLogin}>
+          <input type="text" placeholder="Username" onChange={(e) => setUsername(e.target.value)} required />
+          <input type="password" placeholder="Password" onChange={(e) => setPassword(e.target.value)} required />
+          <button type="submit">Login</button>
+        </form>
+      ) : (
+        <div>
+          <h2>Welcome, {username}!</h2>
+          {/* Additional configuration fields will go here */}
+        </div>
+      )}
+    </div>
+  );
+};
+
+ReactDOM.render(<App />, document.getElementById('root'));
