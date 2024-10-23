@@ -8,13 +8,18 @@ const App = () => {
   const [password, setPassword] = useState('');
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  const handleLogin = async (e) => {
-    e.preventDefault();
-    const response = await fetch('/api/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ username, password }),
-    });
+// frontend/src/index.js
+const baseUrl = process.env.REACT_APP_API_BASE_URL || '/api';
+
+const handleLogin = async (e) => {
+  e.preventDefault();
+  const response = await fetch(`${baseUrl}/login`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username, password }),
+  });
+  // Rest of code remains unchanged
+};
     if (response.ok) {
       setIsLoggedIn(true);
     } else {
@@ -42,3 +47,4 @@ const App = () => {
 };
 
 ReactDOM.render(<App />, document.getElementById('root'));
+REACT_APP_API_BASE_URL=http://localhost:3000/api
