@@ -61,3 +61,6 @@ app.post('/api/sliders', (req, res) => {
 app.listen(port, () => {
   console.log(`Server running on http://localhost:${port}`);
 });
+MONGO_URI=mongodb://localhost:27017/yourdbname
+SESSION_SECRET=your_secret
+PORT=3000
