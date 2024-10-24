@@ -1,0 +1,19 @@
+{
+  "name": "my-app",
+  "version": "1.0.0",
+  "description": "A Node.js and React application.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node backend/server.js",
+    "build": "cd frontend && npm run build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "dependencies": {
+    "express": "^4.17.1",
+    "dotenv": "^10.0.0",
+    "mongoose": "^6.0.0"
+  },
+  "devDependencies": {},
+  "author": "Your Name",
+  "license": "ISC"
+}
