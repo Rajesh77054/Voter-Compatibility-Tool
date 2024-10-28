@@ -1,19 +1,22 @@
 {
-  "name": "my-app",
-  "version": "1.0.0",
-  "description": "A Node.js and React application.",
-  "main": "server.js",
+  "name": "voter-compatibility-tool",
+  "private": true,
+  "workspaces": [
+    "frontend",
+    "backend"
+  ],
   "scripts": {
-    "start": "node backend/server.js",
-    "build": "cd frontend && npm run build",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "concurrently \"npm run start-backend\" \"npm run start-frontend\"",
+    "start-backend": "npm --prefix backend start",
+    "start-frontend": "npm --prefix frontend start",
+    "test": "npm run test-backend && npm run test-frontend",
+    "test-backend": "npm --prefix backend test",
+    "test-frontend": "npm --prefix frontend test",
+    "build": "npm run build-backend && npm run build-frontend",
+    "build-frontend": "npm --prefix frontend build",
+    "build-backend": "echo \"Building backend...\""
   },
-  "dependencies": {
-    "express": "^4.17.1",
-    "dotenv": "^10.0.0",
-    "mongoose": "^6.0.0"
-  },
-  "devDependencies": {},
-  "author": "Your Name",
-  "license": "ISC"
+  "devDependencies": {
+    "concurrently": "^7.0.0"
+  }
 }
