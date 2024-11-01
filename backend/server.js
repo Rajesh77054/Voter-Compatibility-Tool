@@ -2,8 +2,14 @@
 
 const express = require('express');
 const path = require('path');
-const cors = require('cors'); // Add this line
+const cors = require('cors');
+require('dotenv').config(); // Add this line to load environment variables
+const connectDB = require('./database'); // Add this line
+
 const app = express();
+
+// Connect to database
+connectDB(); // Add this line
 
 // Add CORS middleware
 app.use(cors({
