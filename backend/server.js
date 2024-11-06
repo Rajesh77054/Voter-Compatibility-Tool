@@ -1,57 +1,106 @@
-// /backend/server.js
-
 const express = require('express');
 const path = require('path');
 const cors = require('cors');
-require('dotenv').config(); // Add this line to load environment variables
-const connectDB = require('./database'); // Add this line
+const session = require('express-session');
+const passport = require('passport');
+require('dotenv').config();
+require('./config/passport-setup');
+const connectDB = require('./config/database');
+
+// Import routes
+const userEngagementRoute = require('./routes/userEngagement');
+const paymentService = require('./services/paymentGateway');
+const authRoutes = require('./routes/auth');
+const candidatePositionsRoute = require('./routes/candidatePositions');
+
 
 const app = express();
 
 // Connect to database
-connectDB(); // Add this line
+connectDB();
 
-// Add CORS middleware
+// Session configuration - Add before CORS
+app.use(session({
+    secret: process.env.SESSION_SECRET || 'your_session_secret',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        secure: process.env.NODE_ENV === 'production',
+        maxAge: 24 * 60 * 60 * 1000 // 24 hours
+    }
+}));
+
+// Initialize Passport
+app.use(passport.initialize());
+app.use(passport.session());
+
+// CORS configuration
 app.use(cors({
-    origin: process.env.NODE_ENV === 'production' 
-        ? 'your-production-domain.com'  // Replace with your actual domain
-        : 'http://localhost:3000',      // Development frontend URL
+    origin: 'http://localhost:3000',
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
 }));
 
-// Middleware for parsing JSON requests
+// Middleware
 app.use(express.json());
 
-// Define your API routes here
-const userEngagementRoute = require('./routes/userEngagement');
-const paymentService = require('./services/paymentGateway');
-
-app.use('/api/user-engagement', userEngagementRoute);
-app.use('/api/payment', paymentService);
-
-// Add a root route to handle the base URL
-app.get('/', (req, res) => {
-    res.send('Welcome to the backend server!');
+// Debug middleware
+app.use((req, res, next) => {
+    console.log(`${new Date().toISOString()} - ${req.method} ${req.path}`);
+    next();
 });
 
-// Serve static files from the frontend build (if applicable)
+// Auth middleware - import and use
+const auth = require('./middleware/auth');
+
+// API Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/user-engagement', userEngagementRoute);
+app.use('/api/payment', paymentService);
+app.use('/api/candidate-positions', candidatePositionsRoute);
+
+// Google OAuth routes
+app.get('/auth/google',
+    passport.authenticate('google', { scope: ['profile', 'email'] })
+);
+
+app.get('/auth/google/callback', 
+    passport.authenticate('google', { failureRedirect: '/login' }),
+    (req, res) => {
+        // Successful authentication
+        res.redirect('/');
+    }
+);
+
+// Protected admin routes example
+app.use('/api/admin/*', auth, (req, res, next) => {
+    if (req.adminId) {
+        next();
+    } else {
+        res.status(401).json({ message: 'Admin access required' });
+    }
+});
+
+// Static file serving
 app.use(express.static(path.join(__dirname, '../frontend/build')));
 
-// Add error handling middleware
+// Error handling middleware
 app.use((err, req, res, next) => {
-    console.error(err.stack);
+    console.error('Error:', err);
     res.status(500).json({
-        message: 'Something went wrong!',
-        error: process.env.NODE_ENV === 'development' ? err.message : {}
+        status: 'error',
+        message: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error'
     });
 });
 
+// Catch-all route
 app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'));
 });
 
-// Start the server
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
+    console.log(`CORS enabled for origin: http://localhost:3000`);
 });

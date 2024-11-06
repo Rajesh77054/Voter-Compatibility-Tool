@@ -1,11 +1,11 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './styles/styles.css'; // Include your CSS
-import AdminPage from './pages/AdminPage';
+import './styles/styles.css'; // Keeping your current CSS path
+import App from './App';
 
 ReactDOM.render(
     <React.StrictMode>
-        <AdminPage />
+        <App />
     </React.StrictMode>,
     document.getElementById('root')
 );
