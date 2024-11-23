@@ -12,7 +12,8 @@ const userEngagementRoute = require('./routes/userEngagement');
 const paymentService = require('./services/paymentGateway');
 const authRoutes = require('./routes/auth');
 const candidatePositionsRoute = require('./routes/candidatePositions');
-
+const newsRoutes = require('./routes/news');
+const rssRoutes = require('./routes/rss');
 
 const app = express();
 
@@ -45,6 +46,15 @@ app.use(cors({
     credentials: true
 }));
 
+// Add CSP middleware before routes
+app.use((req, res, next) => {
+    res.setHeader(
+        'Content-Security-Policy',
+        "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; connect-src 'self' http://api.mediastack.com; img-src 'self' https:; style-src 'self' 'unsafe-inline';"
+    );
+    next();
+});
+
 // Middleware
 app.use(express.json());
 
@@ -62,6 +72,8 @@ app.use('/api/auth', authRoutes);
 app.use('/api/user-engagement', userEngagementRoute);
 app.use('/api/payment', paymentService);
 app.use('/api/candidate-positions', candidatePositionsRoute);
+app.use('/api', newsRoutes);
+app.use('/api', rssRoutes);
 
 // Google OAuth routes
 app.get('/auth/google',
@@ -90,10 +102,9 @@ app.use(express.static(path.join(__dirname, '../frontend/build')));
 
 // Error handling middleware
 app.use((err, req, res, next) => {
-    console.error('Error:', err);
+    console.error('API Error:', err);
     res.status(500).json({
-        status: 'error',
-        message: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error'
+        error: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error'
     });
 });
 

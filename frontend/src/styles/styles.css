@@ -6,6 +6,8 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    /* ADD NEW: Mobile padding */
+    padding: 1rem;
 }
 
 .reveal-background {
@@ -54,6 +56,16 @@
     background-color: white;
     border-radius: 0.5rem;
     padding: 2rem;
+}
+/* MODIFY EXISTING: Reveal content for mobile */
+.reveal-content {
+    width: 90%;
+    max-width: 600px;
+    max-height: 90vh;
+    overflow-y: auto;
+    background: white;
+    border-radius: 0.5rem;
+    padding: 1rem;
 }
 
 .details-header {
@@ -113,20 +125,29 @@
 /* Container styles */
 .slider-container {
     max-width: 1000px;
-    margin: 0 auto;
-    padding: 20px;
+    margin: 1rem auto;
+    padding: 0;
     background-color: white;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 /* Slider item container */
 .slider-item {
-    margin-bottom: 2.5rem;
+    position: relative;
+    width: 100%;
     padding: 1rem;
     display: flex;
     flex-direction: column;
-    gap: 0rem;
+    gap: 1.5rem;
+    box-sizing: border-box;
+    z-index: 1;
+    /* Remove align-items: center - let labels control their alignment */
+    /* Remove redundant max-width and margin-bottom - gap handles spacing */
 }
 
 /* Slider header */
@@ -135,13 +156,23 @@
     padding-bottom: 0.5rem;
 }
 
-/* Slider controls container */
+/* Base styles for slider controls (mobile-first) */
 .slider-controls {
-    display: grid;
-    grid-template-columns: 200px 1fr 200px;
+    display: flex;
+    flex-direction: column;
     gap: 1rem;
-    align-items: center;
-    position: relative;
+    width: 100%;
+    pointer-events: auto; 
+}
+
+/* Label groups wrapper */
+.label-groups-wrapper {
+    display: flex;
+    flex-direction: row; /* Keep row for space-between */
+    justify-content: space-between;
+    width: 100%;
+    gap: 1rem;
+    pointer-events: auto; 
 }
 
 /* Label groups */
@@ -149,12 +180,15 @@
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    width: 100%; /* Full width on mobile */
+    max-width: 45%;  /* Prevent overlap */
+    word-wrap: break-word;
+    overflow-wrap: break-word;
 }
 
 .label-group.left {
     align-items: flex-start;
     text-align: left;
-    padding-left: 1rem;
 }
 
 .label-group.right {
@@ -162,20 +196,201 @@
     text-align: right;
 }
 
+button[type="submit"] {
+    position: relative;
+    margin-top: 2rem; /* Create space above button */
+    z-index: 2; /* Stack above slider elements */
+    transition: transform 0.2s ease;
+}
+
+.post-submit-container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    position: relative;
+    gap: 1rem;
+}
+
+.post-submit-section {
+    margin: 0rem 0;
+    padding: 0rem;
+    background: white;
+    border-radius: 0.5rem;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    position: relative;
+    z-index: 1;
+}
+
+#rtv-iframe-container {
+    width: 100%;
+    height: 500px;
+    position: relative;
+    z-index: 0;
+}
+
+/* Value indicator styles */
+.animate-fadeIn8.slider-input-container {
+    position: relative;
+    width: 100%;
+    padding: 0 calc(var(--slider-thumb-size) / 2);
+    margin: 1rem 0;
+}
+
+
+
+/* Value indicator wrapper */
+.value-indicator-wrapper {
+    position: absolute;
+    width: 100%; /* Match slider-track-wrapper */
+    top: calc(var(--slider-height) + 8px);
+    left: 0;
+    z-index: 2;
+    height: 10px;
+    display: flex;
+    align-items: center;
+    pointer-events: none; /* Prevent interference */
+}
+
+/* Value indicator positioning */
+.value-indicator {
+    position: absolute;
+    left: (var(--value-position));
+    transform: translateX(-50%);
+    min-width: var(--slider-thumb-size);
+    text-align: center;
+    background: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    border: 1px solid #e5e7eb;
+    font-size: 0.875rem;
+    pointer-events: none;
+    transition: left 0.1s ease-out;
+}
+
+/* Slider input container */
+.slider-input-container {
+    position: relative;
+    width: 100%;
+    overflow: visible; 
+    height: var(--slider-height);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+/* Ensure slider input stays centered */
+.slider-input-container input[type="range"] {
+
+}
+/* Add hover state */
+.slider-input-container:hover .value-indicator {
+    opacity: 1;
+}
+/* Slider track wrapper */
+.slider-track-wrapper {
+    position: relative;
+    width: 100%;
+
+    overflow: visible; /* Allow overflow */
+    height: var(--slider-height);
+    display: flex;
+    align-items: center;
+}
+/* Candidate in track wrapper */
+.slider-track-wrapper .candidate-position {
+    position: absolute;
+    width: var(--slider-thumb-size);
+    height: var(--slider-thumb-size);
+    border-radius: 50%;
+    background: transparent;
+    border: 2px solid currentColor;
+    cursor: pointer;
+    z-index: 2;
+    left: var(--candidate-pos);
+    transform: translateX(-50%);
+    top: calc(50% - 2px); /* Move up 2px */
+    margin-top: calc(var(--slider-thumb-size) / -2);
+}
+
+/* Desktop layout - consolidated */
+@media (min-width: 768px) {
+    /* Grid layout for controls */
+    .slider-controls {
+        display: grid;
+        grid-template-columns: 200px 1fr 200px;
+        gap: 1rem;
+        align-items: center;
+    }
+
+    .label-groups-wrapper {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        grid-column: 1 / -1;
+    }
+
+    .label-group {
+        max-width: 200px;
+        /* Maintain align-items from mobile */
+        display: flex;
+        flex-direction: column;
+    }
+
+    /* Container layout */
+    .slider-container {
+        flex-direction: row;
+        align-items: center;
+    }
+
+    /* Value indicator refinements */
+    .value-indicator {
+        padding-top: 4px;
+        font-size: 0.75rem;
+    }
+
+    /* Match interval visibility */
+    .match-interval {
+        min-width: var(--slider-track-height);
+    }
+
+    /* Container spacing */
+    .slider-input-container {
+        padding: 0;
+        margin: 0;
+    }
+
+    /* Reveal content */
+    .reveal-content {
+        width: 80%;
+        padding: 2rem;
+    }
+}
 /* Label styles */
 .slider-label {
-    font-size: 1rem;
+    font-size: 0.875rem;
     color: #4B5563;
     line-height: 1.25;
     max-width: 180px;
     padding: 0;
     hyphens: auto;
     word-wrap: break-word;
+    margin-bottom: 0.5rem;
+}
+
+.cursor-help {
+    cursor: help;
+}
+
+.slider-label[data-tooltip-id] {
+    cursor: help;
+    position: relative;
 }
 
 /* Add to your styles.css */
 :root {
     --tooltip-z-index: 9999;
+    --slider-height: 40px;
+    --slider-track-height: 8px;
+    --slider-thumb-size: 20px;
 }
 
 /* Override react-tooltip styles */
@@ -194,99 +409,97 @@
     width: 100%;
 }
 
-/* Slider container */
-.slider-input-container {
-    position: relative;
-    height: 24px;
-    width: 100%;
-    display: flex;
-    align-items: center; /* Center children vertically */
-}
-
 /* Custom slider styling */
 input[type="range"] {
     -webkit-appearance: none;
     position: absolute;
-    width: calc(100% + 20px); /* Compensate for thumb width */
-    margin-left: -10px; /* Offset half thumb width */
-    height: 8px;
+    width: calc(100% + var(--slider-thumb-size));
+    margin-left: calc(var(--slider-thumb-size) / -2);
+    height: var(--slider-track-height);
     background: transparent;
+    touch-action: manipulation;
+
+    z-index: 1;
 }
 
 /* Track styling */
 input[type="range"]::-webkit-slider-runnable-track {
     width: 100%;
-    height: 8px;
-    border-radius: 4px;
+    height: var(--slider-track-height);
+    border-radius: var(--slider-track-height);
     background: #e5e7eb;
-    z-index: 0; /* Ensure track stays behind */
+    z-index: 0;
 }
 
 /* Thumb styling - centered vertically in container */
 input[type="range"]::-webkit-slider-thumb {
     -webkit-appearance: none;
-    width: 20px;
-    height: 20px;
+    width: var(--slider-thumb-size);
+    height: var(--slider-thumb-size);
     border-radius: 50%;
     background: var(--thumb-color, #3b82f6);
     border: 2px solid var(--thumb-color, #3b82f6);
     cursor: pointer;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     position: relative;
-    z-index: 2;
-    transform: translateX(-50%);
-    margin-top: -6px; /* Adjust this value to center vertically */
-    transform: translateX(-0%); /* Center thumb on track position */
+
+    z-index: 3;
+    margin-top: calc((var(--slider-thumb-size) - var(--slider-track-height)) / -2);
 }
 
-/* Base value indicator styles */
-.value-indicator {
-    position: absolute;
-    top: 100%;    /* Position all value indicators below */
-    font-size: 0.875rem;
-    font-weight: 500;
-    text-align: center;
-    width: auto;
-    min-width: 20px;
-}
-
-/* Thumb's value indicator */
+/* Thumb's value indicator with width-aware positioning */
 input[type="range"] ~ .value-indicator {
-    left: var(--value-position);
+    position: absolute;
+    /* Start from value position, adjust by thumb width at edges */
+    left: calc(var(--value-position) + (var(--slider-thumb-size) * 
+        (var(--value-position) <= 25% ? 0.5 : 
+         var(--value-position) <= 37.5% ? 0.25 :
+         var(--value-position) >= 75% ? -0.5 :
+         var(--value-position) >= 62.5% ? -0.25 : 0)));
     transform: translateX(-50%);
-    transition: left 0.1s ease;
 }
 
-.candidate-position .value-indicator {
-    left: 50%;    /* Center point of parent */
-    transform: translateX(-50%);  /* Center the indicator using the same strategy as thumb */
+
+/* Ensure candidate value-indicator uses same width reference */
+.candidate-position > .value-indicator {
+    position: absolute;
+    left: calc(50% + (var(--slider-thumb-size) * 
+        (var(--value-position) < 50% ? 0.25 : 
+         var(--value-position) > 50% ? -0.25 : 0)));
+    transform: translateX(-50%);
 }
 
 /* Post-submission styles */
 .candidate-position {
     position: absolute;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    width: 20px;
-    height: 20px;
+    width: var(--slider-thumb-size);
+    height: var(--slider-thumb-size);
     border-radius: 50%;
     background: transparent;
     border: 2px solid currentColor;
     cursor: pointer;
     z-index: 2;
-    left: var(--candidate-position);
+    /* Match thumb horizontal positioning */
+    left: var(--candidate-pos);
+    transform: translateX(-50%);
+    /* Remove vertical offset */
+    margin-top: calc((var(--slider-thumb-size) - var(--slider-track-height)) / -2);
+    /* Remove competing top property */
+    top: 50%;
 }
 
+/* Match interval styling */
 .match-interval {
     position: absolute;
     top: 50%;
     transform: translateY(-50%);
-    height: 8px;
+    height: var(--slider-track-height);
     z-index: 1;
     left: var(--interval-start);
     right: var(--interval-end);
-    border-radius: 4px;
-    display: block; /* Ensure visibility */
+    border-radius: calc(var(--slider-track-height) / 2);
+    display: block;
+    background-color: var(--interval-color, rgba(59, 130, 246, 0.2));
 }
 
 .result-indicator {
