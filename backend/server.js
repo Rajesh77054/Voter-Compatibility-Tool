@@ -46,8 +46,7 @@ app.use(passport.session());
 const allowedOrigins = [
   'https://frontend-deployment-production-0b02.up.railway.app',
   'http://localhost:3000',
-  'http://api.mediastack.com',
-  'https://www.reutersagency.com'
+  'http://api.mediastack.com'
 ];
 
 app.use(cors({
@@ -89,10 +88,12 @@ app.use('/api/user-engagement', userEngagementRoute);
 app.use('/api/payment', paymentService);
 app.use('/api/candidate-positions', candidatePositionsRoute);
 app.use('/api', newsRoutes);
+
+// Keep only this RSS fallback route
 app.use('/api/rss', (req, res) => {
     res.status(503).json({ 
-      message: 'RSS service temporarily unavailable',
-      fallback: 'https://rss.nytimes.com/services/xml/rss/nyt/Politics.xml'
+        message: 'RSS service temporarily unavailable',
+        fallback: 'https://rss.nytimes.com/services/xml/rss/nyt/Politics.xml'
     });
 });
 
