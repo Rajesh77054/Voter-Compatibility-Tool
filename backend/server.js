@@ -13,12 +13,14 @@ const paymentService = require('./services/paymentGateway');
 const authRoutes = require('./routes/auth');
 const candidatePositionsRoute = require('./routes/candidatePositions');
 const newsRoutes = require('./routes/news');
-let rssRoutes;
-try {
-  rssRoutes = require('./routes/rss');
-} catch (error) {
-  console.warn('RSS routes not available:', error.message);
-}
+
+// Temporarily remove RSS routes
+// let rssRoutes;
+// try {
+//   rssRoutes = require('./routes/rss');
+// } catch (error) {
+//   console.warn('RSS routes not available:', error.message);
+// }
 
 const app = express();
 
