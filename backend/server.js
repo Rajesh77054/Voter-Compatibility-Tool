@@ -13,7 +13,12 @@ const paymentService = require('./services/paymentGateway');
 const authRoutes = require('./routes/auth');
 const candidatePositionsRoute = require('./routes/candidatePositions');
 const newsRoutes = require('./routes/news');
-const rssRoutes = require('./routes/rss');
+let rssRoutes;
+try {
+  rssRoutes = require('./routes/rss');
+} catch (error) {
+  console.warn('RSS routes not available:', error.message);
+}
 
 const app = express();
 
@@ -82,7 +87,16 @@ app.use('/api/user-engagement', userEngagementRoute);
 app.use('/api/payment', paymentService);
 app.use('/api/candidate-positions', candidatePositionsRoute);
 app.use('/api', newsRoutes);
-app.use('/api', rssRoutes);
+if (rssRoutes) {
+  app.use('/api/rss', rssRoutes);
+} else {
+  app.use('/api/rss', (req, res) => {
+    res.status(503).json({ 
+      message: 'RSS service temporarily unavailable',
+      fallback: 'https://rss.nytimes.com/services/xml/rss/nyt/Politics.xml'
+    });
+  });
+}
 
 // Google OAuth routes
 app.get('/auth/google',
