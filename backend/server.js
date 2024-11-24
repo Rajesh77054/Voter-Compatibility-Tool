@@ -89,16 +89,12 @@ app.use('/api/user-engagement', userEngagementRoute);
 app.use('/api/payment', paymentService);
 app.use('/api/candidate-positions', candidatePositionsRoute);
 app.use('/api', newsRoutes);
-if (rssRoutes) {
-  app.use('/api/rss', rssRoutes);
-} else {
-  app.use('/api/rss', (req, res) => {
+app.use('/api/rss', (req, res) => {
     res.status(503).json({ 
       message: 'RSS service temporarily unavailable',
       fallback: 'https://rss.nytimes.com/services/xml/rss/nyt/Politics.xml'
     });
-  });
-}
+});
 
 // Google OAuth routes
 app.get('/auth/google',
