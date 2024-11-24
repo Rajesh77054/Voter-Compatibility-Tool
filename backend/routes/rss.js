@@ -1,13 +1,24 @@
 // backend/routes/rss.js
 const express = require('express');
 const router = express.Router();
-const Parser = require('rss-parser');
 const axios = require('axios');
+const Parser = require('rss-parser');
+const parser = new Parser();
 
-router.get('/rss', async (req, res) => {
+// Simple in-memory cache
+const cache = new Map();
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+router.get('/', async (req, res) => {
     try {
-        const url = decodeURIComponent(req.query.url);
+        const { url } = req.query;
         console.log('RSS request received for:', url);
+
+        // Check cache
+        const cachedData = cache.get(url);
+        if (cachedData && Date.now() - cachedData.timestamp < CACHE_DURATION) {
+            return res.json(cachedData.data);
+        }
 
         // Validate URL
         try {
@@ -16,30 +27,37 @@ router.get('/rss', async (req, res) => {
             return res.status(400).json({ error: 'Invalid URL format' });
         }
 
-        // First verify feed exists with proper headers
         const response = await axios.get(url, {
             headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36',
-                'Accept': 'application/rss+xml, application/xml, application/atom+xml, text/xml;q=0.9, */*;q=0.8',
-                'Accept-Language': 'en-US,en;q=0.9'
-            }
+                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)',
+                'Accept': 'application/rss+xml, application/xml, text/xml',
+                'Referer': 'https://www.reutersagency.com/',
+                'Cache-Control': 'no-cache'
+            },
+            timeout: 5000
         });
 
-        const parser = new Parser({
-            headers: {
-                'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
-            }
-        });
-
-        const feed = await parser.parseURL(url);
-        console.log('Feed parsed successfully, items:', feed.items?.length);
-        res.json(feed);
+        const feed = await parser.parseString(response.data);
         
+        // Validate feed structure
+        if (!feed.items || !Array.isArray(feed.items)) {
+            throw new Error('Invalid feed format');
+        }
+
+        // Cache the result
+        cache.set(url, {
+            timestamp: Date.now(),
+            data: feed
+        });
+
+        res.json(feed);
+
     } catch (error) {
-        console.error('RSS Error:', error.message);
-        res.status(500).json({ 
-            error: 'RSS fetch failed', 
-            details: error.message 
+        console.error('RSS Error:', error.response?.status, error.message);
+        res.status(500).json({
+            error: 'RSS fetch failed',
+            details: error.message,
+            status: error.response?.status
         });
     }
 });

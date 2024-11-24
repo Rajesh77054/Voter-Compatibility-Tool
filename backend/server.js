@@ -36,23 +36,30 @@ app.use(passport.initialize());
 app.use(passport.session());
 
 // CORS configuration
-const corsOptions = {
-  origin: [
-    'https://frontend-deployment-production-0b02.up.railway.app',
-    'http://localhost:3000' // for local development
-  ],
-  methods: ['GET', 'POST'],
-  credentials: true,
-  optionsSuccessStatus: 200
-};
+const allowedOrigins = [
+  'https://frontend-deployment-production-0b02.up.railway.app',
+  'http://localhost:3000',
+  'http://api.mediastack.com',
+  'https://www.reutersagency.com'
+];
 
-app.use(cors(corsOptions));
+app.use(cors({
+  origin: function(origin, callback) {
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'OPTIONS']
+}));
 
 // Add CSP middleware before routes
 app.use((req, res, next) => {
     res.setHeader(
         'Content-Security-Policy',
-        "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; connect-src 'self' http://api.mediastack.com; img-src 'self' https:; style-src 'self' 'unsafe-inline';"
+        "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; connect-src 'self' http://api.mediastack.com https://www.reutersagency.com; img-src 'self' https:; style-src 'self' 'unsafe-inline';"
     );
     next();
 });
@@ -108,6 +115,15 @@ app.use((err, req, res, next) => {
     res.status(500).json({
         error: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error'
     });
+});
+
+// Add error handling for RSS endpoint
+app.use((err, req, res, next) => {
+  console.error('RSS API Error:', err);
+  res.status(500).json({ 
+    error: 'Internal Server Error',
+    message: err.message 
+  });
 });
 
 // Catch-all route
