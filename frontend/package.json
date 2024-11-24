@@ -8,7 +8,8 @@
     "build": "react-scripts build",
     "test": "react-scripts test --env=jsdom",
     "build:prod": "webpack --mode production",
-    "analyze": "source-map-explorer 'build/*.js'"
+    "analyze": "source-map-explorer 'build/*.js'",
+    "test:ci": "react-scripts test --env=jsdom --watchAll=false"
   },
   "dependencies": {
     "axios": "^0.21.1",

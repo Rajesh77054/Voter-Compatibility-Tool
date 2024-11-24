@@ -3,35 +3,8 @@ import { Tooltip } from 'react-tooltip';
 import '../styles/styles.css';
 import RevealSequence from './RevealSequence';
 import NewsResults from './NewsResults';
-import PropTypes from 'prop-types';
 
-// Add Error Boundary
-class VoterSliderErrorBoundary extends React.Component {
-  constructor(props) {
-    super(props);
-    this.state = { hasError: false };
-  }
-
-  static getDerivedStateFromError(error) {
-    return { hasError: true };
-  }
-
-  render() {
-    if (this.state.hasError) {
-      return <h2>Something went wrong. Please try again.</h2>;
-    }
-    return this.props.children;
-  }
-}
-
-// Add Loading State
-const LoadingSpinner = () => (
-  <div role="status" aria-label="Loading">
-    <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24"/>
-  </div>
-);
-
-const VoterSlider = ({ onSubmitResult, isLoading }) => {  // Component function starts here
+const VoterSlider = ({ onSubmitResult }) => {  // Component function starts here
     // All state declarations
     const [positions, setPositions] = useState({  // Add this missing state
         taxation: 3,
@@ -350,245 +323,206 @@ const VoterSlider = ({ onSubmitResult, isLoading }) => {  // Component function 
     };
 
     return (
-        <>
-            {isLoading ? (
-                <LoadingSpinner />
-            ) : (
-                <div className="min-h-screen bg-gray-50">
-                    <div className="slider-container">
-                    <div className="flex justify-between items-center mb-6">
-                        <h1 className="text-4xl font-bold text-gray-900">
-                            {hasSubmitted && (
-                                <span 
-                                    style={{ 
-                                        color: matchResults.overallMatch >= 90 ? '#10B981' :
-                                            matchResults.overallMatch >= 75 ? '#3B82F6' :
-                                            matchResults.overallMatch >= 50 ? '#F59E0B' : '#EF4444'
-                                    }}
+        <div className="min-h-screen bg-gray-50">
+            <div className="slider-container">
+            <div className="flex justify-between items-center mb-6">
+                <h1 className="text-4xl font-bold text-gray-900">
+                    {hasSubmitted && (
+                        <span 
+                            style={{ 
+                                color: matchResults.overallMatch >= 90 ? '#10B981' :
+                                    matchResults.overallMatch >= 75 ? '#3B82F6' :
+                                    matchResults.overallMatch >= 50 ? '#F59E0B' : '#EF4444'
+                            }}
+                        >
+                            Overall Compatibility: {matchResults.overallMatch}%
+                        </span>
+                    )}
+                </h1>
+            </div>
+                <form onSubmit={handleSubmit} className="space-y-8">
+                    {issues.map((issue) => (
+                        <div key={issue.id} className="slider-item">
+                            <div className="slider-header">
+                                <h2 className="text-xl font-semibold">
+                                    {issue.title}
+                                </h2>
+                            </div>
+                            <div className="slider-controls">
+                            <div className="label-groups-wrapper">
+                            <div className="label-group left">
+                                <div 
+                                    className="slider-label cursor-help"
+                                    data-tooltip-id={`left-tooltip-${issue.id}`}
+                                    data-tooltip-content={issue.leftDescription}
                                 >
-                                    Overall Compatibility: {matchResults.overallMatch}%
-                                </span>
-                            )}
-                        </h1>
-                    </div>
-                        <form onSubmit={handleSubmit} className="space-y-8">
-                            {issues.map((issue) => (
-                                <div key={issue.id} className="slider-item">
-                                    <div className="slider-header">
-                                        <h2 className="text-xl font-semibold">
-                                            {issue.title}
-                                        </h2>
-                                    </div>
-                                    <div className="slider-controls">
-                                    <div className="label-groups-wrapper">
-                                        <div className="label-group left">
-                                            <div 
-                                                className="slider-label cursor-help"
-                                                data-tooltip-id={`left-tooltip-${issue.id}`}
-                                                data-tooltip-content={issue.leftDescription}
-                                            >
-                                                {issue.leftLabel}
-                                            </div>
-                                        </div>
-                                        <div className="label-group right">
-                                            <div 
-                                                className="slider-label cursor-help"
-                                                data-tooltip-id={`right-tooltip-${issue.id}`}
-                                                data-tooltip-content={issue.rightDescription}
-                                            >
-                                                {issue.rightLabel}
-                                            </div>
-                                        </div>
-                                    </div>
-                                        <div className="slider-input-container">
-                                        <div className="slider-track-wrapper">
-                                            <input
-                                                type="range"
-                                                min="1"
-                                                max="5"
-                                                value={positions[issue.id]}
-                                                onChange={(e) => {
-                                                    const value = parseInt(e.target.value);
-                                                    setPositions({
-                                                        ...positions,
-                                                        [issue.id]: value
-                                                    });
-                                                    updateValuePosition(value);
-                                                }}
-                                                className="default-track"
-                                                style={{
-                                                    '--thumb-color': hasSubmitted ? (
-                                                        matchResults.issueMatches?.[issue.id] >= 100 ? '#10B981' :
-                                                        matchResults.issueMatches?.[issue.id] >= 75 ? '#3B82F6' :
-                                                        matchResults.issueMatches?.[issue.id] >= 50 ? '#F59E0B' : '#EF4444'
-                                                    ) : '#3b82f6'
-                                                }}
-                                            />
-                                            {hasSubmitted && (
-                                                <div 
-                                                    className="candidate-position"
-                                                    style={{
-                                                        left: `${((candidatePositions[issue.id] - 1) / 4) * 100}%`,
-                                                        borderColor: matchResults.issueMatches?.[issue.id] >= 100 ? '#10B981' :
-                                                                    matchResults.issueMatches?.[issue.id] >= 75 ? '#3B82F6' :
-                                                                    matchResults.issueMatches?.[issue.id] >= 50 ? '#F59E0B' : '#EF4444'
-                                                    }}
-                                                />
-                                            )}
-                                        </div>
-                                        <div className="value-indicator-wrapper">
-                                            <div 
-                                                className="value-indicator"
-                                                style={{
-                                                    left: `${((positions[issue.id] - 1) / 4) * 100}%`,
-                                                    color: hasSubmitted ? (
-                                                        matchResults.issueMatches?.[issue.id] >= 100 ? '#10B981' :
-                                                        matchResults.issueMatches?.[issue.id] >= 75 ? '#3B82F6' :
-                                                        matchResults.issueMatches?.[issue.id] >= 50 ? '#F59E0B' : '#EF4444'
-                                                    ) : '#4B5563'
-                                                }}
-                                            >
-                                                {positions[issue.id]}
-                                            </div>
-                                            {hasSubmitted && (
-                                                <div 
-                                                    className="value-indicator"
-                                                    style={{ 
-                                                        left: `${((candidatePositions[issue.id] - 1) / 4) * 100}%`,
-                                                        color: matchResults.issueMatches?.[issue.id] >= 100 ? '#10B981' :
-                                                            matchResults.issueMatches?.[issue.id] >= 75 ? '#3B82F6' :
-                                                            matchResults.issueMatches?.[issue.id] >= 50 ? '#F59E0B' : '#EF4444'
-                                                    }}
-                                                >
-                                                    {candidatePositions[issue.id]}
-                                                </div>
-                                            )}
-                                        </div>
-                                                
-                                                {/* Show candidate position and match interval after submission */}
-                                                {hasSubmitted && (
-                                                    <>
-                                                        {/* Match interval fill */}
-                                                        <div 
-                                                            className="match-interval"
-                                                            style={{
-                                                                '--interval-start': `${Math.min(
-                                                                    ((positions[issue.id] - 1) / 4) * 100,
-                                                                    ((candidatePositions[issue.id] - 1) / 4) * 100
-                                                                )}%`,
-                                                                '--interval-end': `${100 - Math.max(
-                                                                    ((positions[issue.id] - 1) / 4) * 100,
-                                                                    ((candidatePositions[issue.id] - 1) / 4) * 100
-                                                                )}%`,
-                                                                backgroundColor: matchResults.issueMatches?.[issue.id] >= 100 ? '#10B981' :
-                                                                                matchResults.issueMatches?.[issue.id] >= 75 ? '#3B82F6' :
-                                                                                matchResults.issueMatches?.[issue.id] >= 50 ? '#F59E0B' : '#EF4444'
-                                                            }}
-                                                        />
-
-
-                                                    {/* Match percentage indicator */}
-                                                    <div 
-                                                        className="result-indicator"
-                                                        style={{ 
-                                                            color: matchResults.issueMatches?.[issue.id] >= 100 ? '#10B981' :
-                                                                matchResults.issueMatches?.[issue.id] >= 75 ? '#3B82F6' :
-                                                                matchResults.issueMatches?.[issue.id] >= 50 ? '#F59E0B' : '#EF4444'
-                                                        }}
-                                                    >
-                                                        {matchResults.issueMatches?.[issue.id]}% Match
-                                                    </div>
-                                                </>
-                                            )}
-                                        </div>
-                                    </div>
-                                    <Tooltip id={`left-tooltip-${issue.id}`} />
-                                    <Tooltip id={`right-tooltip-${issue.id}`} />
-                                </div>
-                            ))}
-                            
-                                {/* Submit and Reset buttons */}
-                                <div className="mt-12 space-y-4">
-                                    <button
-                                        type="submit"
-                                        className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors shadow-lg"
-                                        disabled={hasSubmitted}
-                                    >
-                                        Calculate Compatibility
-                                    </button>
-                                    {hasSubmitted && (
-                                        <button
-                                            type="button"
-                                            onClick={handleReset}
-                                            className="w-full border border-blue-600 text-blue-600 py-3 px-4 rounded-lg hover:bg-blue-50 transition-colors"
-                                        >
-                                            Reset
-                                        </button>
-                                    )}
-                                </div>
-                            </form>
-                        </div>
-                        {showReveal && (
-                            <RevealSequence
-                                matchData={{
-                                    overallMatch: matchResults.overallMatch,
-                                    issueMatches: matchResults.issueMatches
-                                }}
-                                issues={issues}
-                                onComplete={() => {
-                                    setShowReveal(false);
-                                    setHasSubmitted(true);
-                                }}
-                            />
-                        )}
-
-                        {hasSubmitted && !showReveal && (
-                            <div className="post-submit-container">
-                                {/* News Section */}
-                                <div className="post-submit-section">
-                                    <h2>Related News</h2>
-                                    <NewsResults 
-                                        topic={Object.keys(matchResults.issueMatches)[0]}
-                                        position={positions[Object.keys(positions)[0]]}
-                                    />
+                                    {issue.leftLabel}
                                 </div>
                             </div>
-                        )}
+                            <div className="label-group right">
+                                <div 
+                                    className="slider-label cursor-help"
+                                    data-tooltip-id={`right-tooltip-${issue.id}`}
+                                    data-tooltip-content={issue.rightDescription}
+                                >
+                                    {issue.rightLabel}
+                                </div>
+                            </div>
+                        </div>
+                                <div className="slider-input-container">
+                                <div className="slider-track-wrapper">
+                                    <input
+                                        type="range"
+                                        min="1"
+                                        max="5"
+                                        value={positions[issue.id]}
+                                        onChange={(e) => {
+                                            const value = parseInt(e.target.value);
+                                            setPositions({
+                                                ...positions,
+                                                [issue.id]: value
+                                            });
+                                            updateValuePosition(value);
+                                        }}
+                                        className="default-track"
+                                        style={{
+                                            '--thumb-color': hasSubmitted ? (
+                                                matchResults.issueMatches?.[issue.id] >= 100 ? '#10B981' :
+                                                matchResults.issueMatches?.[issue.id] >= 75 ? '#3B82F6' :
+                                                matchResults.issueMatches?.[issue.id] >= 50 ? '#F59E0B' : '#EF4444'
+                                            ) : '#3b82f6'
+                                        }}
+                                    />
+                                    {hasSubmitted && (
+                                        <div 
+                                            className="candidate-position"
+                                            style={{
+                                                left: `${((candidatePositions[issue.id] - 1) / 4) * 100}%`,
+                                                borderColor: matchResults.issueMatches?.[issue.id] >= 100 ? '#10B981' :
+                                                            matchResults.issueMatches?.[issue.id] >= 75 ? '#3B82F6' :
+                                                            matchResults.issueMatches?.[issue.id] >= 50 ? '#F59E0B' : '#EF4444'
+                                            }}
+                                        />
+                                    )}
+                                </div>
+                                <div className="value-indicator-wrapper">
+                                    <div 
+                                        className="value-indicator"
+                                        style={{
+                                            left: `${((positions[issue.id] - 1) / 4) * 100}%`,
+                                            color: hasSubmitted ? (
+                                                matchResults.issueMatches?.[issue.id] >= 100 ? '#10B981' :
+                                                matchResults.issueMatches?.[issue.id] >= 75 ? '#3B82F6' :
+                                                matchResults.issueMatches?.[issue.id] >= 50 ? '#F59E0B' : '#EF4444'
+                                            ) : '#4B5563'
+                                        }}
+                                    >
+                                        {positions[issue.id]}
+                                    </div>
+                                    {hasSubmitted && (
+                                        <div 
+                                            className="value-indicator"
+                                            style={{ 
+                                                left: `${((candidatePositions[issue.id] - 1) / 4) * 100}%`,
+                                                color: matchResults.issueMatches?.[issue.id] >= 100 ? '#10B981' :
+                                                    matchResults.issueMatches?.[issue.id] >= 75 ? '#3B82F6' :
+                                                    matchResults.issueMatches?.[issue.id] >= 50 ? '#F59E0B' : '#EF4444'
+                                            }}
+                                        >
+                                            {candidatePositions[issue.id]}
+                                        </div>
+                                    )}
+                                </div>
+                                        
+                                        {/* Show candidate position and match interval after submission */}
+                                        {hasSubmitted && (
+                                            <>
+                                                {/* Match interval fill */}
+                                                <div 
+                                                    className="match-interval"
+                                                    style={{
+                                                        '--interval-start': `${Math.min(
+                                                            ((positions[issue.id] - 1) / 4) * 100,
+                                                            ((candidatePositions[issue.id] - 1) / 4) * 100
+                                                        )}%`,
+                                                        '--interval-end': `${100 - Math.max(
+                                                            ((positions[issue.id] - 1) / 4) * 100,
+                                                            ((candidatePositions[issue.id] - 1) / 4) * 100
+                                                        )}%`,
+                                                        backgroundColor: matchResults.issueMatches?.[issue.id] >= 100 ? '#10B981' :
+                                                                        matchResults.issueMatches?.[issue.id] >= 75 ? '#3B82F6' :
+                                                                        matchResults.issueMatches?.[issue.id] >= 50 ? '#F59E0B' : '#EF4444'
+                                                    }}
+                                                />
+
+
+                                            {/* Match percentage indicator */}
+                                            <div 
+                                                className="result-indicator"
+                                                style={{ 
+                                                    color: matchResults.issueMatches?.[issue.id] >= 100 ? '#10B981' :
+                                                        matchResults.issueMatches?.[issue.id] >= 75 ? '#3B82F6' :
+                                                        matchResults.issueMatches?.[issue.id] >= 50 ? '#F59E0B' : '#EF4444'
+                                                }}
+                                            >
+                                                {matchResults.issueMatches?.[issue.id]}% Match
+                                            </div>
+                                        </>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+                    ))}
+                    
+                        {/* Submit and Reset buttons */}
+                        <div className="mt-12 space-y-4">
+                            <button
+                                type="submit"
+                                className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors shadow-lg"
+                                disabled={hasSubmitted}
+                            >
+                                Calculate Compatibility
+                            </button>
+                            {hasSubmitted && (
+                                <button
+                                    type="button"
+                                    onClick={handleReset}
+                                    className="w-full border border-blue-600 text-blue-600 py-3 px-4 rounded-lg hover:bg-blue-50 transition-colors"
+                                >
+                                    Reset
+                                </button>
+                            )}
+                        </div>
+                    </form>
+                </div>
+                {showReveal && (
+                    <RevealSequence
+                        matchData={{
+                            overallMatch: matchResults.overallMatch,
+                            issueMatches: matchResults.issueMatches
+                        }}
+                        issues={issues}
+                        onComplete={() => {
+                            setShowReveal(false);
+                            setHasSubmitted(true);
+                        }}
+                    />
+                )}
+
+                {hasSubmitted && !showReveal && (
+                    <div className="post-submit-container">
+                        {/* News Section */}
+                        <div className="post-submit-section">
+                            <h2>Related News</h2>
+                            <NewsResults 
+                                topic={Object.keys(matchResults.issueMatches)[0]}
+                                position={positions[Object.keys(positions)[0]]}
+                            />
+                        </div>
                     </div>
                 )}
-        </>
+            </div>
     );
 };
 
-// Merge with existing PropTypes
-const existingPropTypes = {
-    ...VoterSlider.propTypes,
-    isLoading: PropTypes.bool,
-    onSubmit: PropTypes.func.isRequired
-};
-
-// Add Memoization
-const MemoizedVoterSlider = React.memo(VoterSlider);
-
-// Add PropTypes validation
-VoterSlider.propTypes = {
-  issues: PropTypes.arrayOf(
-    PropTypes.shape({
-      id: PropTypes.string.isRequired,
-      title: PropTypes.string.isRequired,
-      description: PropTypes.string
-    })
-  ).isRequired,
-  onSubmit: PropTypes.func.isRequired,
-  isLoading: PropTypes.bool
-};
-
-// Basic unit test setup
-describe('VoterSlider', () => {
-  it('renders without crashing', () => {
-    render(<VoterSlider issues={[]} onSubmit={() => {}} />);
-  });
-});
-
-// Wrap existing export
-export default React.memo(VoterSlider);
+export default VoterSlider;
