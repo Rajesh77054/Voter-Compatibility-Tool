@@ -128,21 +128,14 @@ app.use('/api/admin/*', auth, (req, res, next) => {
 // Static file serving
 app.use(express.static(path.join(__dirname, '../frontend/build')));
 
-// Error handling middleware
+// backend/server.js - Clean up error handlers
+// Keep only one error handler before routes
 app.use((err, req, res, next) => {
-    console.error('API Error:', err);
+    console.error('Server Error:', err);
     res.status(500).json({
-        error: process.env.NODE_ENV === 'development' ? err.message : 'Internal server error'
+        error: process.env.NODE_ENV === 'development' ? err.message : 'Internal Server Error',
+        path: req.path
     });
-});
-
-// Add error handling for RSS endpoint
-app.use((err, req, res, next) => {
-  console.error('RSS API Error:', err);
-  res.status(500).json({ 
-    error: 'Internal Server Error',
-    message: err.message 
-  });
 });
 
 // Catch-all route
@@ -150,16 +143,8 @@ app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'));
 });
 
-// backend/server.js - Remove duplicate listen and consolidate
+// Single listen with logging
 const PORT = process.env.PORT || 5000;
-
-// Add error handler before listen
-app.use((err, req, res, next) => {
-    console.error('Server Error:', err.stack);
-    res.status(500).json({ error: 'Internal Server Error' });
-});
-
-// Single listen with all logging
 app.listen(PORT, () => {
     console.log('Server environment:', process.env.NODE_ENV);
     console.log(`Server is running on port ${PORT}`);
