@@ -7,6 +7,12 @@ require('dotenv').config();
 require('./config/passport-setup');
 const connectDB = require('./config/database');
 
+// backend/server.js - Add at top
+process.on('uncaughtException', (error) => {
+    console.error('Uncaught Exception:', error);
+    process.exit(1);
+});
+
 // Import routes
 const userEngagementRoute = require('./routes/userEngagement');
 const paymentService = require('./services/paymentGateway');
@@ -144,10 +150,11 @@ app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'));
 });
 
+// Add port configuration
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-    console.log(`CORS enabled for origin: http://localhost:3000`);
+    console.log(`Server running on port ${PORT}`);
+    console.log('Environment:', process.env.NODE_ENV);
 });
 
 app.get('/api/test', (req, res) => {
