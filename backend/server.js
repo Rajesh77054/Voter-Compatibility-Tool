@@ -150,11 +150,20 @@ app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, '../frontend/build', 'index.html'));
 });
 
-// Add port configuration
+// backend/server.js - Remove duplicate listen and consolidate
 const PORT = process.env.PORT || 5000;
+
+// Add error handler before listen
+app.use((err, req, res, next) => {
+    console.error('Server Error:', err.stack);
+    res.status(500).json({ error: 'Internal Server Error' });
+});
+
+// Single listen with all logging
 app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
-    console.log('Environment:', process.env.NODE_ENV);
+    console.log('Server environment:', process.env.NODE_ENV);
+    console.log(`Server is running on port ${PORT}`);
+    console.log('Database status:', mongoose.connection.readyState ? 'Connected' : 'Disconnected');
 });
 
 app.get('/api/test', (req, res) => {
