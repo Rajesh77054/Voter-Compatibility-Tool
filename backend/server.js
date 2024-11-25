@@ -13,20 +13,12 @@ process.on('uncaughtException', (error) => {
     process.exit(1);
 });
 
-// Import routes
+// Import routes - remove RSS
 const userEngagementRoute = require('./routes/userEngagement');
 const paymentService = require('./services/paymentGateway');
 const authRoutes = require('./routes/auth');
 const candidatePositionsRoute = require('./routes/candidatePositions');
 const newsRoutes = require('./routes/news');
-
-// Temporarily remove RSS routes
-// let rssRoutes;
-// try {
-//   rssRoutes = require('./routes/rss');
-// } catch (error) {
-//   console.warn('RSS routes not available:', error.message);
-// }
 
 const app = express();
 
